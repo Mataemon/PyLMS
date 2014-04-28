@@ -7,7 +7,7 @@ It brings new features like:
 <li>Add python music player: It allows you to play music (using gstreamer)</li>
 </ul>
 
-Unfortunaltely some works remain to do:
+Unfortunately some works remain to do:
 <ul>
 <li>Music player: for now only supports mp3 playback</li>
 <li>Search function needs to be implemented in pylmslibrary.py file</li>
