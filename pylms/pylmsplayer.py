@@ -76,7 +76,7 @@ class Player(object):
     
     def request(self, command_string, preserve_encoding=False):
         """Executes Telnet Request via Server"""
-        return self.server.request("%s %s" % (self.mac, command_string), preserve_encoding)
+        return self.server.request("%s %s" % (self.mac, command_string), not preserve_encoding)
     
     def update(self, index, update=True):
         """Update Player Properties from Server"""
@@ -423,7 +423,7 @@ class Player(object):
         """Play/Pause Toggle"""
         self.request("pause")
 
-    def next(self):
+    def __next__(self):
         """Next Track"""
         self.request("playlist jump +1")
 
@@ -638,13 +638,13 @@ class Player(object):
             import urllib.parse
             return urllib.parse.quote(text, encoding=self.charset)
         except ImportError:
-            import urllib
-            return urllib.quote(text)
+            import urllib.request, urllib.parse, urllib.error
+            return urllib.parse.quote(text)
 
     def __unquote(self, text):
         try:
             import urllib.parse
             return urllib.parse.unquote(text, encoding=self.charset)
         except ImportError:
-            import urllib
-            return urllib.unquote(text)
+            import urllib.request, urllib.parse, urllib.error
+            return urllib.parse.unquote(text)

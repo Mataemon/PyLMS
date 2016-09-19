@@ -23,11 +23,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from pylmsserver import LMSServer
+from .pylmsserver import LMSServer
 import threading
 import os
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 class CacheCovers(threading.Thread):
     """cache covers for thumbnails"""
@@ -51,9 +51,9 @@ class CacheCovers(threading.Thread):
         """start process"""
         self.logger.debug('CacheCovers started')
         for album in self.albums:
-            if not album.has_key('id'):
+            if 'id' not in album:
                 self.logger.warning('Album has no Id !?!?')
-            elif not album.has_key('artwork_track_id'):
+            elif 'artwork_track_id' not in album:
                 self.logger.warning('Album "%s" has no artwork_track_id field' % album['id'])
             else:
                 url = 'http://%s:%d/music/%s/cover_100x100.png' % (self.server_ip, self.server_port, album['artwork_track_id'])
@@ -62,7 +62,7 @@ class CacheCovers(threading.Thread):
                 if not os.path.exists(path):
                     #cover not exists
                     fil = open(path, 'wb')
-                    bin = urllib.urlopen(url)
+                    bin = urllib.request.urlopen(url)
                     fil.write(bin.read())
                     fil.close()
             

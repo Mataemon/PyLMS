@@ -23,12 +23,12 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
-from pylmsserver import LMSServer, LMSServerNotifications
-from pylmslibrary import LMSLibrary
+from .pylmsserver import LMSServer, LMSServerNotifications
+from .pylmslibrary import LMSLibrary
 import threading
 import os
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import time
 
 class LMSPlaylist(LMSServerNotifications):
@@ -69,7 +69,7 @@ class LMSPlaylist(LMSServerNotifications):
         """Filter response by timestamp
             return True if response must be filtered"""
         msec = self.__millitime()
-        if self.__lastresponse.has_key(player_id):
+        if player_id in self.__lastresponse:
             if msec<(self.__lastresponse[player_id] + self.FILTER_TIMEOUT):
                 #forget response
                 return True
@@ -234,7 +234,7 @@ class LMSPlaylist(LMSServerNotifications):
                     else:
                         song.update({'current':False})
                     playlist.append( song )
-            except Exception, e:
+            except Exception as e:
                 #problem during song infos retrieving
                 self.logger.error('Unable to get song infos: %s' % str(e))
         
@@ -279,7 +279,7 @@ if __name__=="__main__":
     lib = None
     
     def check_field(field, song):
-        if song.has_key(field):
+        if field in song:
             return song[field]
         else:
             logger.info('Song has no field "%s" [%s]' % (field, song))

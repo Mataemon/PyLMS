@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """
 
 import telnetlib
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from pylmsplayer import Player
 import threading
 import logging
@@ -67,12 +67,13 @@ class LMSServer(object):
         Connect
         """
         if self.telnet_connect():
-            if self.login():
-                self.get_players(update=update)
-            else:
-                self.telnet = None
-                self.logger.debug('Login failed')
-                return False
+            #if self.login():
+            self.login()
+            self.get_players(update=update)
+            #else:
+            #    self.telnet = None
+            #    self.logger.debug('Login failed')
+            #    return False
         else:
             self.telnet = None
             return False
@@ -152,7 +153,7 @@ class LMSServer(object):
             self.logger.debug('command="%s"' % command)
             command = command.strip()
             command_len = len( command.strip().split(' ') )
-            if command.endswith(u'?'):
+            if command.endswith('?'):
                 command_len -= 1
             command_encoded = (command.strip()).encode(self.charset)
 
@@ -161,20 +162,22 @@ class LMSServer(object):
             response = self.telnet.read_until( '\n'.encode(self.charset) )
             response = response.strip()
             self.logger.debug('response="%s"' % response)
+            self.logger.debug('response="%s"' % response.decode())
 
             #process response
-            response_parts = response.split(' ')
-            response_len = len(response.split(' '))
+            response_parts = response.decode(self.charset).split(' ')
+            response_len = len(response.decode(self.charset).split(' '))
             self.logger.debug('command_parts=%d' % command_len)
             self.logger.debug('response_parts=%d' % response_len)
         
             #process result
             result = ''
             for i in range(command_len, response_len):
+                self.logger.debug(self._decode(response_parts[i]))
                 if decode_output:
-                    result += self._decode(response_parts[i]) + u' '
+                    result += self._decode(response_parts[i]) + ' '
                 else:
-                    result += unicode(response_parts[i]) + u' '
+                    result += str(response_parts[i]) + ' '
             result = result.strip()
             self.logger.debug('result="%s"' % result)
         
@@ -322,7 +325,7 @@ class LMSServer(object):
         return self.request_with_results("rescanprogress")
     
     def _decode(self, string):
-        return urllib.unquote_plus(string).encode(self.charset)
+        return urllib.parse.unquote_plus(string)#.encode(self.charset)
 
 
 
@@ -386,7 +389,7 @@ class LMSServerNotifications(threading.Thread, LMSServer):
                     items = response.split(' ')
                     #and unquote all items
                     for i in range(len(items)):
-                        items[i] = urllib.unquote(items[i].strip())
+                        items[i] = urllib.parse.unquote(items[i].strip())
 
                     #finally process response
                     if self._player_ids:

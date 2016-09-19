@@ -63,12 +63,12 @@ class SlimAudioBuffer(threading.Thread):
             
             self.status_socket = SlimAudioBuffer.SOCKET_READ_HEADER
             self.logger.debug('Connected!')
-        except socket.error, e:
+        except socket.error as e:
             #failed to connect
             self.status_socket = SlimAudioBuffer.SOCKET_UNREACHABLE
             self.logger.critical('Connection failed: %s' % e)
             return False
-        except socket.timeout, e:
+        except socket.timeout as e:
             #unable to connect
             self.status_socket = SlimAudioBuffer.SOCKET_TIMEOUT
             self.logger.critical('Connection timeout: %s' % e)
@@ -145,7 +145,7 @@ class SlimAudioBuffer(threading.Thread):
                     self.status_socket = SlimAudioBuffer.SOCKET_ERROR
                     self.disconnect()
                     break
-        except socket.error, e:
+        except socket.error as e:
             self.logger.error('Socket recv error')
             self.status_socket = SlimAudioBuffer.SOCKET_ERROR
             self.disconnect()
@@ -160,12 +160,12 @@ class SlimAudioBuffer(threading.Thread):
             else:
                 #nothing to read on socket, disconnect it
                 self.disconnect()
-        except socket.timeout, e:
+        except socket.timeout as e:
             #timeout
             self.logger.error('Socket recv timeout')
             self.status_socket = SlimAudioBuffer.SOCKET_TIMEOUT
             self.disconnect()
-        except socket.error, e:
+        except socket.error as e:
             self.logger.error('Socket recv error')
             self.status_socket = SlimAudioBuffer.SOCKET_ERROR
             self.disconnect()

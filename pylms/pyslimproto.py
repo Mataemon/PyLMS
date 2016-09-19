@@ -5,7 +5,7 @@ import logging
 import threading
 import time
 from collections import namedtuple
-import Queue
+import queue
 from slimaudio import SlimAudio, SlimAudioBuffer
 
 
@@ -70,8 +70,8 @@ class SlimProtoSocket(threading.Thread):
         
         #members
         self.status = SlimProtoSocket.STATUS_DISCONNECTED
-        self.send_queue = Queue.Queue()
-        self.recv_queue = Queue.Queue()
+        self.send_queue = queue.Queue()
+        self.recv_queue = queue.Queue()
         
     def connect(self):
         """connect to server"""
@@ -81,7 +81,7 @@ class SlimProtoSocket(threading.Thread):
             self.socket.connect((self.server_ip, self.server_port))
             self.logger.debug('Connected!')
             self.status = SlimProtoSocket.STATUS_CONNECTED
-        except socket.error, e:
+        except socket.error as e:
             self.logger.critical('Connection failed: %s' % e)
             self.status = SlimProtoSocket.STATUS_ERROR
             return False
@@ -324,7 +324,7 @@ class SlimProto(threading.Thread):
                             duration = 0
                             try:
                                 duration = int(strm['replay_gain'])
-                            except ValueError,e:
+                            except ValueError as e:
                                 duration = 0
                             #pause playback
                             self.slim_audio.pause_playback(duration)
@@ -335,7 +335,7 @@ class SlimProto(threading.Thread):
                             unpause_jiffies = 0
                             try:
                                 unpause_jiffies = int(strm['replay_gain'])
-                            except ValueError,e:
+                            except ValueError as e:
                                 unpause_jiffies = 0
                             #unpause playback
                             if unpause_jiffies==0:
@@ -456,13 +456,13 @@ class SlimProto(threading.Thread):
                 'spdif_enable', 'trans_period', 'trans_type', 'flags', 'output_threshold', 'reserved', 'replay_gain', 
                 'server_port', 'server_ip']
         values = struct.unpack('!7c7BIHI', cmd_data)
-        return dict(zip(keys, values))
+        return dict(list(zip(keys, values)))
         
     def __parse_audg(self, cmd_data):
         """parse audg command"""
         keys = ['old_gainL', 'old_gainR', 'fixed_digital', 'preamp', 'gainL', 'gainR']
         values = struct.unpack('!llBBll', cmd_data)
-        return dict(zip(keys, values))
+        return dict(list(zip(keys, values)))
         
     def __get_http_header(self, cmd_data):
         """get http header from strm data"""
